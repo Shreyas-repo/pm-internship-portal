@@ -1,0 +1,215 @@
+<div class="col">
+    <div class="card internship-card h-100 border-0 shadow-sm">
+        <!-- Card Header -->
+        <div class="card-header bg-white border-0 d-flex justify-content-between align-items-start p-3">
+            <div class="flex-grow-1 me-2">
+                <h5 class="card-title mb-1 fw-bold text-dark">
+                    {{ internship.title }}
+                </h5>
+                <div class="d-flex align-items-center gap-2 flex-wrap">
+                    <h6 class="card-subtitle text-muted mb-0">
+                        <i class="fas fa-building me-1"></i>{{ internship.company }}
+                    </h6>
+                    {% if internship.is_ml_recommendation %}
+                        <span class="badge bg-gradient bg-info text-white">
+                            <i class="fas fa-robot me-1"></i>AI Match
+                        </span>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <!-- Save Button -->
+            <form method="POST" action="{{ url_for('save_internship', internship_id=internship.id) }}" class="d-inline">
+                <button type="submit" class="btn btn-link p-1 border-0 save-btn" title="{{ 'Remove from saved' if internship.id in user_saved_ids else 'Save internship' }}">
+                    {% if internship.id in user_saved_ids %}
+                        <i class="fas fa-heart text-danger" style="font-size: 1.3em;"></i>
+                    {% else %}
+                        <i class="far fa-heart text-muted" style="font-size: 1.3em;"></i>
+                    {% endif %}
+                </button>
+            </form>
+        </div>
+        
+        <!-- Card Body -->
+        <div class="card-body p-3 pt-0">
+            <!-- Key Information -->
+            <div class="row g-2 mb-3">
+                <div class="col-6">
+                    <div class="info-item">
+                        <i class="fas fa-map-marker-alt text-primary me-2"></i>
+                        <small class="text-muted">Location</small>
+                        <div class="fw-semibold">{{ internship.location }}</div>
+                    </div>
+                </div>
+                <div class="col-6">
+                    <div class="info-item">
+                        <i class="fas fa-clock text-success me-2"></i>
+                        <small class="text-muted">Duration</small>
+                        <div class="fw-semibold">{{ internship.duration }}</div>
+                    </div>
+                </div>
+                {% if internship.stipend %}
+                <div class="col-6">
+                    <div class="info-item">
+                        <i class="fas fa-money-bill-wave text-warning me-2"></i>
+                        <small class="text-muted">Stipend</small>
+                        <div class="fw-semibold text-success">{{ internship.stipend }}</div>
+                    </div>
+                </div>
+                {% endif %}
+                <div class="col-6">
+                    <div class="info-item">
+                        <i class="fas fa-industry text-info me-2"></i>
+                        <small class="text-muted">Sector</small>
+                        <div class="fw-semibold">{{ internship.sector }}</div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Description -->
+            <div class="description-section mb-3">
+                <p class="card-text text-muted mb-2">{{ internship.description|truncate(120) }}</p>
+            </div>
+            
+            <!-- ML Similarity Score -->
+            {% if internship.is_ml_recommendation and internship.ml_similarity %}
+            <div class="similarity-score mb-3">
+                <div class="d-flex align-items-center justify-content-between">
+                    <small class="text-info fw-semibold">
+                        <i class="fas fa-chart-line me-1"></i> 
+                        Match Score
+                    </small>
+                    <div class="d-flex align-items-center">
+                        <div class="progress me-2" style="width: 60px; height: 6px;">
+                            <div class="progress-bar bg-info" data-similarity="{{ internship.ml_similarity }}"></div>
+                        </div>
+                        <small class="text-info fw-bold">{{ "%.0f"|format(internship.ml_similarity * 100) }}%</small>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+        
+        <!-- Card Footer -->
+        <div class="card-footer bg-light border-0 p-3">
+            <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
+                <!-- Dates -->
+                <div class="dates-info">
+                    <div class="d-flex align-items-center mb-1">
+                        <i class="fas fa-calendar-plus text-muted me-1" style="font-size: 0.8em;"></i>
+                        <small class="text-muted">Posted {{ internship.posted_date.strftime('%b %d') }}</small>
+                    </div>
+                    {% if internship.application_deadline %}
+                    <div class="d-flex align-items-center">
+                        <i class="fas fa-calendar-times text-danger me-1" style="font-size: 0.8em;"></i>
+                        <small class="text-danger fw-semibold">Apply by {{ internship.application_deadline.strftime('%b %d') }}</small>
+                    </div>
+                    {% endif %}
+                </div>
+                
+                <!-- Action Button -->
+                <div class="action-buttons">
+                    <button type="button" class="btn btn-primary btn-sm" onclick="showInternshipDetails('{{ internship.id }}')">
+                        <i class="fas fa-external-link-alt me-1"></i>
+                        <span class="d-none d-sm-inline">Learn More</span>
+                        <span class="d-sm-none">View</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.internship-card {
+    transition: all 0.3s ease;
+    border-radius: 1rem;
+    overflow: hidden;
+}
+
+.internship-card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.15) !important;
+}
+
+.info-item {
+    padding: 0.5rem;
+    background: rgba(13, 110, 253, 0.05);
+    border-radius: 0.5rem;
+    text-align: center;
+}
+
+.info-item small {
+    display: block;
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.info-item div {
+    font-size: 0.85rem;
+    margin-top: 0.25rem;
+}
+
+.save-btn {
+    transition: all 0.3s ease;
+}
+
+.save-btn:hover {
+    transform: scale(1.1);
+}
+
+.description-section {
+    border-left: 3px solid var(--primary-color);
+    padding-left: 0.75rem;
+}
+
+.similarity-score {
+    background: rgba(13, 202, 240, 0.1);
+    padding: 0.5rem;
+    border-radius: 0.5rem;
+}
+
+.dates-info small {
+    font-size: 0.75rem;
+}
+
+@media (max-width: 576px) {
+    .card-body {
+        padding: 1rem !important;
+    }
+    
+    .card-footer {
+        padding: 1rem !important;
+    }
+    
+    .info-item {
+        padding: 0.4rem;
+        margin-bottom: 0.5rem;
+    }
+    
+    .info-item div {
+        font-size: 0.8rem;
+    }
+    
+    .row.g-2 {
+        --bs-gutter-x: 0.5rem;
+    }
+}
+</style>
+
+<script>
+function showInternshipDetails(internshipId) {
+    // This would typically open a modal or navigate to details page
+    alert('Opening internship details for ID: ' + internshipId + '\n\nThis is an AI-powered recommendation. Visit the company website to apply!');
+}
+
+// Set progress bar widths after page load
+document.addEventListener('DOMContentLoaded', function() {
+    const progressBars = document.querySelectorAll('.progress-bar[data-similarity]');
+    progressBars.forEach(bar => {
+        const similarity = parseFloat(bar.getAttribute('data-similarity'));
+        bar.style.width = (similarity * 100) + '%';
+    });
+});
+</script>

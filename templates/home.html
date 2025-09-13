@@ -1,0 +1,336 @@
+{% extends "layout.html" %}
+{% block content %}
+<!-- Hero Section -->
+<div class="search-container mb-4">
+    <div class="text-center mb-4">
+        <h1 class="display-5 fw-bold text-primary mb-3">
+            <i class="fas fa-briefcase me-3"></i>{{ static_text.welcome }} {{ current_user.name.split()[0] if current_user.name else 'User' }}!
+        </h1>
+        <p class="lead text-muted mb-4">{{ static_text.find_internships or 'Discover your perfect internship with AI-powered recommendations' }}</p>
+        
+        <!-- Quick Stats -->
+        <div class="row text-center mb-4">
+            <div class="col-4">
+                <div class="stat-item">
+                    <i class="fas fa-search fa-2x text-primary mb-2"></i>
+                    <h4 class="fw-bold">Smart</h4>
+                    <small class="text-muted">AI Search</small>
+                </div>
+            </div>
+            <div class="col-4">
+                <div class="stat-item">
+                    <i class="fas fa-star fa-2x text-warning mb-2"></i>
+                    <h4 class="fw-bold">Save</h4>
+                    <small class="text-muted">Favorites</small>
+                </div>
+            </div>
+            <div class="col-4">
+                <div class="stat-item">
+                    <i class="fas fa-chart-line fa-2x text-success mb-2"></i>
+                    <h4 class="fw-bold">Track</h4>
+                    <small class="text-muted">Progress</small>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Enhanced Search Form -->
+    <form method="POST" action="{{ url_for('home') }}" class="search-form">
+        {{ search_form.hidden_tag() }}
+        
+        <!-- Main Search Bar -->
+        <div class="search-bar-container mb-4">
+            <div class="input-group input-group-lg">
+                <span class="input-group-text bg-white border-end-0">
+                    <i class="fas fa-search text-primary"></i>
+                </span>
+                {{ search_form.query(class="form-control form-control-lg border-start-0 border-end-0", placeholder="Search for internships... (e.g., Data Science, Marketing, Web Development)", autocomplete="off") }}
+                <button type="submit" class="btn btn-primary btn-lg px-4">
+                    <i class="fas fa-search me-2"></i>{{ static_text.submit_search or 'Search' }}
+                </button>
+            </div>
+        </div>
+        
+        <!-- Advanced Filters (Collapsible) -->
+        <div class="advanced-filters">
+            <div class="d-flex justify-content-center mb-3">
+                <button type="button" class="btn btn-outline-secondary btn-sm" data-bs-toggle="collapse" data-bs-target="#advancedFilters" aria-expanded="false">
+                    <i class="fas fa-sliders-h me-2"></i>Advanced Filters
+                    <i class="fas fa-chevron-down ms-2"></i>
+                </button>
+            </div>
+            
+            <div class="collapse" id="advancedFilters">
+                <div class="card border-0 bg-light">
+                    <div class="card-body">
+                        <div class="row g-3">
+                            <!-- Skills -->
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold">
+                                    <i class="fas fa-code me-2 text-primary"></i>Skills
+                                </label>
+                                {{ search_form.skills(class="form-control", placeholder="e.g., Python, React, Marketing") }}
+                            </div>
+                            
+                            <!-- Location -->
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold">
+                                    <i class="fas fa-map-marker-alt me-2 text-primary"></i>Preferred City
+                                </label>
+                                {{ search_form.city(class="form-control", placeholder="e.g., Mumbai, Delhi, Bangalore") }}
+                            </div>
+                            
+                            <!-- Search Type -->
+                            <div class="col-12">
+                                <label class="form-label fw-semibold">
+                                    <i class="fas fa-robot me-2 text-primary"></i>Search Method
+                                </label>
+                                {{ search_form.search_type(class="form-select") }}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+
+<!-- Results Section -->
+{% if query %}
+    <!-- Results Header -->
+    <div class="results-header mb-4">
+        <div class="d-flex justify-content-between align-items-center flex-wrap">
+            <div class="mb-2 mb-md-0">
+                <h3 class="mb-1">
+                    <i class="fas fa-search-plus me-2 text-primary"></i>
+                    {{ static_text.results_for or 'Results for' }} <span class="text-primary">"{{ query }}"</span>
+                </h3>
+                <p class="text-muted mb-0">
+                    {% if internships %}
+                        Found {{ internships|length }} internship{{ 's' if internships|length != 1 else '' }}
+                    {% else %}
+                        No results found
+                    {% endif %}
+                </p>
+            </div>
+            
+            <!-- Quick Actions -->
+            <div class="d-flex gap-2">
+                <button type="button" class="btn btn-outline-primary btn-sm" data-bs-toggle="collapse" data-bs-target="#filterSort">
+                    <i class="fas fa-filter me-1"></i>Filters
+                </button>
+                <a href="{{ url_for('home') }}" class="btn btn-outline-secondary btn-sm">
+                    <i class="fas fa-times me-1"></i>Clear
+                </a>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Filter and Sort Panel -->
+    <div class="collapse mb-4" id="filterSort">
+        <div class="card border-0 bg-light">
+            <div class="card-body">
+                <form method="GET" action="{{ url_for('home') }}">
+                    <input type="hidden" name="query" value="{{ query }}">
+                    <input type="hidden" name="skills" value="{{ request.args.get('skills', '') }}">
+                    <input type="hidden" name="city" value="{{ request.args.get('city', '') }}">
+                    <input type="hidden" name="search_type" value="{{ search_form.search_type.data }}">
+
+                    <div class="row g-3 align-items-end">
+                        <!-- Status Filters -->
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold mb-2">
+                                <i class="fas fa-clock me-2 text-primary"></i>Status
+                            </label>
+                            <div class="d-flex flex-wrap gap-3">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" name="filter_status" value="ongoing" id="ongoing"
+                                           {% if "ongoing" in active_filters %}checked{% endif %}>
+                                    <label class="form-check-label" for="ongoing">
+                                        <span class="badge bg-success me-1">●</span>Ongoing
+                                    </label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" name="filter_status" value="future" id="future"
+                                           {% if "future" in active_filters %}checked{% endif %}>
+                                    <label class="form-check-label" for="future">
+                                        <span class="badge bg-info me-1">●</span>Future
+                                    </label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" name="filter_status" value="expired" id="expired"
+                                           {% if "expired" in active_filters %}checked{% endif %}>
+                                    <label class="form-check-label" for="expired">
+                                        <span class="badge bg-secondary me-1">●</span>Expired
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Sort Options -->
+                        <div class="col-md-4">
+                            <label class="form-label fw-semibold" for="sortBy">
+                                <i class="fas fa-sort me-2 text-primary"></i>Sort By
+                            </label>
+                            <select name="sort_by" id="sortBy" class="form-select">
+                                <option value="posted_date" {% if sort_by == 'posted_date' %}selected{% endif %}>
+                                    <i class="fas fa-calendar"></i> Date Posted
+                                </option>
+                                <option value="deadline" {% if sort_by == 'deadline' %}selected{% endif %}>
+                                    <i class="fas fa-clock"></i> Deadline
+                                </option>
+                                <option value="stipend" {% if sort_by == 'stipend' %}selected{% endif %}>
+                                    <i class="fas fa-money-bill"></i> Stipend
+                                </option>
+                                <option value="similarity" {% if sort_by == 'similarity' %}selected{% endif %}>
+                                    <i class="fas fa-star"></i> Relevance
+                                </option>
+                            </select>
+                        </div>
+                        
+                        <!-- Apply Button -->
+                        <div class="col-md-2">
+                            <button type="submit" class="btn btn-primary w-100">
+                                <i class="fas fa-check me-1"></i>Apply
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Results Grid -->
+    {% if internships %}
+        <div class="row row-cols-1 row-cols-md-2 row-cols-xl-3 g-4">
+            {% for internship in internships %}
+                {% include "internship_card.html" %}
+            {% endfor %}
+        </div>
+        
+        <!-- Load More Button (if needed) -->
+        {% if internships|length >= 20 %}
+        <div class="text-center mt-5">
+            <button type="button" class="btn btn-outline-primary" onclick="alert('Load more functionality can be implemented')">
+                <i class="fas fa-plus me-2"></i>Load More Internships
+            </button>
+        </div>
+        {% endif %}
+    {% else %}
+        <!-- No Results -->
+        <div class="text-center py-5">
+            <div class="mb-4">
+                <i class="fas fa-search fa-4x text-muted mb-3"></i>
+                <h4 class="text-muted">No internships found</h4>
+                <p class="text-muted">Try adjusting your search criteria or filters</p>
+            </div>
+            
+            <div class="d-flex justify-content-center gap-3 flex-wrap">
+                <button type="button" class="btn btn-outline-primary" onclick="clearSearch()">
+                    <i class="fas fa-times me-2"></i>Clear Search
+                </button>
+                <button type="button" class="btn btn-outline-secondary" data-bs-toggle="collapse" data-bs-target="#advancedFilters">
+                    <i class="fas fa-sliders-h me-2"></i>Try Advanced Filters
+                </button>
+            </div>
+        </div>
+    {% endif %}
+{% else %}
+    <!-- Welcome Message for New Users -->
+    <div class="text-center py-5">
+        <div class="mb-4">
+            <i class="fas fa-rocket fa-4x text-primary mb-3"></i>
+            <h4>Ready to find your dream internship?</h4>
+            <p class="text-muted">Use the search bar above to discover opportunities tailored for you</p>
+        </div>
+        
+        <!-- Popular Searches -->
+        <div class="popular-searches">
+            <h6 class="text-muted mb-3">Popular Searches:</h6>
+            <div class="d-flex justify-content-center flex-wrap gap-2">
+                <button type="button" class="btn btn-outline-primary btn-sm" onclick="quickSearch('Data Science')">
+                    Data Science
+                </button>
+                <button type="button" class="btn btn-outline-primary btn-sm" onclick="quickSearch('Web Development')">
+                    Web Development
+                </button>
+                <button type="button" class="btn btn-outline-primary btn-sm" onclick="quickSearch('Marketing')">
+                    Marketing
+                </button>
+                <button type="button" class="btn btn-outline-primary btn-sm" onclick="quickSearch('Design')">
+                    Design
+                </button>
+                <button type="button" class="btn btn-outline-primary btn-sm" onclick="quickSearch('Finance')">
+                    Finance
+                </button>
+            </div>
+        </div>
+    </div>
+{% endif %}
+
+<style>
+.search-container {
+    background: linear-gradient(135deg, rgba(13, 110, 253, 0.1) 0%, rgba(255, 255, 255, 1) 100%);
+    border-radius: 1rem;
+    padding: 2rem;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+}
+
+.search-bar-container .input-group {
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    border-radius: 0.75rem;
+    overflow: hidden;
+}
+
+.search-bar-container .form-control:focus {
+    box-shadow: none;
+    border-color: #e9ecef;
+}
+
+.stat-item {
+    padding: 1rem;
+    transition: transform 0.3s ease;
+}
+
+.stat-item:hover {
+    transform: translateY(-5px);
+}
+
+.results-header {
+    background: white;
+    padding: 1.5rem;
+    border-radius: 0.75rem;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+}
+
+.popular-searches .btn {
+    margin: 0.25rem;
+}
+
+@media (max-width: 768px) {
+    .search-container {
+        padding: 1.5rem 1rem;
+    }
+    
+    .input-group-lg .btn {
+        padding: 0.75rem 1rem;
+    }
+    
+    .stat-item h4 {
+        font-size: 1.1rem;
+    }
+}
+</style>
+
+<script>
+function quickSearch(term) {
+    document.querySelector('input[name="query"]').value = term;
+    document.querySelector('.search-form').submit();
+}
+
+function clearSearch() {
+    document.querySelector('input[name="query"]').value = '';
+    document.querySelector('form').submit();
+}
+</script>
+{% endblock content %}

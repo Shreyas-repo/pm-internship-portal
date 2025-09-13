@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="{{ session.get('lang', 'en') }}">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>{{ static_text.app_title }} - {{ title }}</title>
+    <meta name="description" content="Find the perfect internship opportunity with AI-powered recommendations">
+    <meta name="theme-color" content="#0d6efd">
+    
+    <!-- Preconnect for performance -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome for icons -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
+</head>
+<body class="d-flex flex-column">
+    <header>
+        <nav class="navbar navbar-expand-lg navbar-dark">
+            <div class="container">
+                <a class="navbar-brand d-flex align-items-center" href="{{ url_for('home') if current_user.is_authenticated else url_for('login') }}">
+                    <i class="fas fa-briefcase me-2"></i>
+                    <span class="d-none d-sm-inline">{{ static_text.app_title }}</span>
+                    <span class="d-sm-none">PM Internship</span>
+                </a>
+                
+                <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                
+                <div class="collapse navbar-collapse" id="navbarNav">
+                    <ul class="navbar-nav me-auto">
+                        {% if current_user.is_authenticated %}
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ url_for('home') }}">
+                                <i class="fas fa-home me-1"></i>
+                                <span class="d-lg-inline d-none">{{ static_text.home or 'Home' }}</span>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ url_for('dashboard') }}">
+                                <i class="fas fa-tachometer-alt me-1"></i>
+                                <span class="d-lg-inline d-none">{{ static_text.dashboard or 'Dashboard' }}</span>
+                            </a>
+                        </li>
+                        {% endif %}
+                    </ul>
+                    
+                    <ul class="navbar-nav ms-auto align-items-center">
+                        <!-- Language Dropdown -->
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                <i class="fas fa-globe me-1"></i>
+                                <span class="d-none d-md-inline">Language</span>
+                            </a>
+                            <ul class="dropdown-menu dropdown-menu-end shadow">
+                                <li>
+                                    <a class="dropdown-item" href="{{ url_for('set_lang', lang_code='en', query=request.args.get('query'), search_type=request.args.get('search_type')) }}">
+                                        <i class="fas fa-flag-usa me-2"></i>English
+                                    </a>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item" href="{{ url_for('set_lang', lang_code='hi', query=request.args.get('query'), search_type=request.args.get('search_type')) }}">
+                                        <i class="fas fa-flag me-2"></i>हिंदी
+                                    </a>
+                                </li>
+                            </ul>
+                        </li>
+                        
+                        {% if current_user.is_authenticated %}
+                            <!-- User Profile Dropdown -->
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                    <i class="fas fa-user-circle me-1"></i>
+                                    <span class="d-none d-md-inline">{{ current_user.name.split()[0] if current_user.name else 'User' }}</span>
+                                </a>
+                                <ul class="dropdown-menu dropdown-menu-end shadow">
+                                    <li>
+                                        <a class="dropdown-item" href="{{ url_for('profile') }}">
+                                            <i class="fas fa-user me-2"></i>{{ static_text.profile or 'Profile' }}
+                                        </a>
+                                    </li>
+                                    <li><hr class="dropdown-divider"></li>
+                                    <li>
+                                        <a class="dropdown-item text-danger" href="{{ url_for('logout') }}">
+                                            <i class="fas fa-sign-out-alt me-2"></i>{{ static_text.logout or 'Logout' }}
+                                        </a>
+                                    </li>
+                                </ul>
+                            </li>
+                        {% else %}
+                            <li class="nav-item">
+                                <a class="nav-link" href="{{ url_for('login') }}">
+                                    <i class="fas fa-sign-in-alt me-1"></i>
+                                    {{ static_text.login or 'Login' }}
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link btn btn-outline-light btn-sm ms-2 px-3" href="{{ url_for('signup') }}">
+                                    {{ static_text.signup or 'Sign Up' }}
+                                </a>
+                            </li>
+                        {% endif %}
+                    </ul>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <main class="container-fluid px-3 px-md-4 py-4 flex-grow-1">
+        <!-- Flash Messages -->
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                <div class="row justify-content-center">
+                    <div class="col-12 col-lg-10">
+                        {% for category, message in messages %}
+                            <div class="alert alert-{{ 'danger' if category == 'error' else category }} alert-dismissible fade show" role="alert">
+                                <i class="fas fa-{{ 'exclamation-triangle' if category == 'warning' else 'info-circle' if category == 'info' else 'check-circle' if category == 'success' else 'exclamation-circle' }} me-2"></i>
+                                {{ message }}
+                                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            {% endif %}
+        {% endwith %}
+        
+        <!-- Main Content -->
+        <div class="row justify-content-center">
+            <div class="col-12 col-lg-10">
+                {% block content %}{% endblock %}
+            </div>
+        </div>
+    </main>
+
+    <footer class="text-center text-light py-4 mt-auto">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-md-6 text-md-start text-center mb-2 mb-md-0">
+                    <p class="mb-0">
+                        <i class="fas fa-briefcase me-2"></i>
+                        {{ static_text.all_rights_reserved or '© 2024 PM Internship Scheme. All rights reserved.' }}
+                    </p>
+                </div>
+                <div class="col-md-6 text-md-end text-center">
+                    <div class="social-links">
+                        <a href="#" class="text-light me-3" title="Help">
+                            <i class="fas fa-question-circle"></i>
+                        </a>
+                        <a href="#" class="text-light me-3" title="Contact">
+                            <i class="fas fa-envelope"></i>
+                        </a>
+                        <a href="#" class="text-light" title="Support">
+                            <i class="fas fa-headset"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Bootstrap JS Bundle with Popper -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- Custom JavaScript -->
+    <script>
+        // Auto-dismiss alerts after 5 seconds
+        document.addEventListener('DOMContentLoaded', function() {
+            const alerts = document.querySelectorAll('.alert:not(.alert-danger)');
+            alerts.forEach(function(alert) {
+                setTimeout(function() {
+                    const bsAlert = new bootstrap.Alert(alert);
+                    bsAlert.close();
+                }, 5000);
+            });
+        });
+        
+        // Add loading state to buttons
+        document.querySelectorAll('form').forEach(function(form) {
+            form.addEventListener('submit', function() {
+                const submitBtn = form.querySelector('button[type="submit"], input[type="submit"]');
+                if (submitBtn) {
+                    submitBtn.disabled = true;
+                    const originalText = submitBtn.innerHTML;
+                    submitBtn.innerHTML = '<span class="loading me-2"></span>' + originalText;
+                    
+                    // Re-enable after 10 seconds as fallback
+                    setTimeout(function() {
+                        submitBtn.disabled = false;
+                        submitBtn.innerHTML = originalText;
+                    }, 10000);
+                }
+            });
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,292 @@
+{% extends "layout.html" %}
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-11 col-sm-10 col-md-8 col-lg-7 col-xl-6">
+        <!-- Header Section -->
+        <div class="text-center mb-4">
+            <div class="mb-3">
+                <i class="fas fa-user-plus fa-3x text-primary"></i>
+            </div>
+            <h1 class="h3 mb-2 fw-bold">{{ static_text.get('signup_title', 'Create Account') }}</h1>
+            <p class="text-muted">{{ static_text.get('signup_subtitle', 'Join thousands of students finding their dream internships') }}</p>
+        </div>
+
+        <!-- Signup Card -->
+        <div class="card border-0 shadow-lg">
+            <div class="card-body p-4 p-md-5">
+                <form method="POST" action="" novalidate>
+                    {{ form.hidden_tag() }}
+                    
+                    <!-- Progress Indicator -->
+                    <div class="mb-4">
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <small class="text-muted">Step 1 of 1</small>
+                            <small class="text-muted">Complete Profile</small>
+                        </div>
+                        <div class="progress" style="height: 4px;">
+                            <div class="progress-bar bg-primary" style="width: 100%"></div>
+                        </div>
+                    </div>
+                    
+                    <!-- Personal Information Section -->
+                    <div class="mb-4">
+                        <h5 class="text-primary mb-3">
+                            <i class="fas fa-user me-2"></i>Personal Information
+                        </h5>
+                        
+                        <div class="row g-3">
+                            <!-- Full Name -->
+                            <div class="col-12">
+                                <div class="input-group">
+                                    <span class="input-group-text bg-light border-end-0">
+                                        <i class="fas fa-user text-muted"></i>
+                                    </span>
+                                    {% if form.name.errors %}
+                                        {{ form.name(class="form-control border-start-0 is-invalid", placeholder="Enter your full name", autocomplete="name") }}
+                                        <div class="invalid-feedback">
+                                            {% for error in form.name.errors %}
+                                                <i class="fas fa-exclamation-circle me-1"></i>{{ error }}
+                                            {% endfor %}
+                                        </div>
+                                    {% else %}
+                                        {{ form.name(class="form-control border-start-0", placeholder="Enter your full name", autocomplete="name") }}
+                                    {% endif %}
+                                </div>
+                            </div>
+                            
+                            <!-- Email -->
+                            <div class="col-12">
+                                <div class="input-group">
+                                    <span class="input-group-text bg-light border-end-0">
+                                        <i class="fas fa-envelope text-muted"></i>
+                                    </span>
+                                    {% if form.email.errors %}
+                                        {{ form.email(class="form-control border-start-0 is-invalid", placeholder="Enter your email address", autocomplete="email") }}
+                                        <div class="invalid-feedback">
+                                            {% for error in form.email.errors %}
+                                                <i class="fas fa-exclamation-circle me-1"></i>{{ error }}
+                                            {% endfor %}
+                                        </div>
+                                    {% else %}
+                                        {{ form.email(class="form-control border-start-0", placeholder="Enter your email address", autocomplete="email") }}
+                                    {% endif %}
+                                </div>
+                            </div>
+                            
+                            <!-- Phone -->
+                            <div class="col-md-6">
+                                <div class="input-group">
+                                    <span class="input-group-text bg-light border-end-0">
+                                        <i class="fas fa-phone text-muted"></i>
+                                    </span>
+                                    {% if form.phone.errors %}
+                                        {{ form.phone(class="form-control border-start-0 is-invalid", placeholder="Phone number", autocomplete="tel") }}
+                                        <div class="invalid-feedback">
+                                            {% for error in form.phone.errors %}
+                                                <i class="fas fa-exclamation-circle me-1"></i>{{ error }}
+                                            {% endfor %}
+                                        </div>
+                                    {% else %}
+                                        {{ form.phone(class="form-control border-start-0", placeholder="Phone number", autocomplete="tel") }}
+                                    {% endif %}
+                                </div>
+                            </div>
+                            
+                            <!-- Location -->
+                            <div class="col-md-6">
+                                <div class="input-group">
+                                    <span class="input-group-text bg-light border-end-0">
+                                        <i class="fas fa-map-marker-alt text-muted"></i>
+                                    </span>
+                                    {% if form.location.errors %}
+                                        {{ form.location(class="form-control border-start-0 is-invalid", placeholder="Your city", autocomplete="address-level2") }}
+                                        <div class="invalid-feedback">
+                                            {% for error in form.location.errors %}
+                                                <i class="fas fa-exclamation-circle me-1"></i>{{ error }}
+                                            {% endfor %}
+                                        </div>
+                                    {% else %}
+                                        {{ form.location(class="form-control border-start-0", placeholder="Your city", autocomplete="address-level2") }}
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Education Section -->
+                    <div class="mb-4">
+                        <h5 class="text-primary mb-3">
+                            <i class="fas fa-graduation-cap me-2"></i>Education Details
+                        </h5>
+                        
+                        <div class="row g-3">
+                            <!-- College -->
+                            <div class="col-12">
+                                <div class="input-group">
+                                    <span class="input-group-text bg-light border-end-0">
+                                        <i class="fas fa-university text-muted"></i>
+                                    </span>
+                                    {% if form.college.errors %}
+                                        {{ form.college(class="form-control border-start-0 is-invalid", placeholder="College/University name", autocomplete="organization") }}
+                                        <div class="invalid-feedback">
+                                            {% for error in form.college.errors %}
+                                                <i class="fas fa-exclamation-circle me-1"></i>{{ error }}
+                                            {% endfor %}
+                                        </div>
+                                    {% else %}
+                                        {{ form.college(class="form-control border-start-0", placeholder="College/University name", autocomplete="organization") }}
+                                    {% endif %}
+                                </div>
+                            </div>
+                            
+                            <!-- Field of Study -->
+                            <div class="col-12">
+                                <div class="input-group">
+                                    <span class="input-group-text bg-light border-end-0">
+                                        <i class="fas fa-book text-muted"></i>
+                                    </span>
+                                    {% if form.education.errors %}
+                                        {{ form.education(class="form-control border-start-0 is-invalid", placeholder="Field of study (e.g., Computer Science)") }}
+                                        <div class="invalid-feedback">
+                                            {% for error in form.education.errors %}
+                                                <i class="fas fa-exclamation-circle me-1"></i>{{ error }}
+                                            {% endfor %}
+                                        </div>
+                                    {% else %}
+                                        {{ form.education(class="form-control border-start-0", placeholder="Field of study (e.g., Computer Science)") }}
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Security Section -->
+                    <div class="mb-4">
+                        <h5 class="text-primary mb-3">
+                            <i class="fas fa-shield-alt me-2"></i>Account Security
+                        </h5>
+                        
+                        <div class="row g-3">
+                            <!-- Password -->
+                            <div class="col-md-6">
+                                <div class="input-group">
+                                    <span class="input-group-text bg-light border-end-0">
+                                        <i class="fas fa-lock text-muted"></i>
+                                    </span>
+                                    {% if form.password.errors %}
+                                        {{ form.password(class="form-control border-start-0 is-invalid", placeholder="Create password", autocomplete="new-password") }}
+                                        <div class="invalid-feedback">
+                                            {% for error in form.password.errors %}
+                                                <i class="fas fa-exclamation-circle me-1"></i>{{ error }}
+                                            {% endfor %}
+                                        </div>
+                                    {% else %}
+                                        {{ form.password(class="form-control border-start-0", placeholder="Create password", autocomplete="new-password") }}
+                                    {% endif %}
+                                </div>
+                                <small class="text-muted">Minimum 6 characters</small>
+                            </div>
+                            
+                            <!-- Confirm Password -->
+                            <div class="col-md-6">
+                                <div class="input-group">
+                                    <span class="input-group-text bg-light border-end-0">
+                                        <i class="fas fa-lock text-muted"></i>
+                                    </span>
+                                    {% if form.confirm_password.errors %}
+                                        {{ form.confirm_password(class="form-control border-start-0 is-invalid", placeholder="Confirm password", autocomplete="new-password") }}
+                                        <div class="invalid-feedback">
+                                            {% for error in form.confirm_password.errors %}
+                                                <i class="fas fa-exclamation-circle me-1"></i>{{ error }}
+                                            {% endfor %}
+                                        </div>
+                                    {% else %}
+                                        {{ form.confirm_password(class="form-control border-start-0", placeholder="Confirm password", autocomplete="new-password") }}
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Terms and Conditions -->
+                    <div class="mb-4">
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="terms" required>
+                            <label class="form-check-label text-muted small" for="terms">
+                                I agree to the <a href="#" class="text-decoration-none">Terms of Service</a> and 
+                                <a href="#" class="text-decoration-none">Privacy Policy</a>
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <!-- Submit Button -->
+                    <div class="d-grid mb-3">
+                        {{ form.submit(class="btn btn-primary btn-lg", value=static_text.get('signup_button', 'Create Account')) }}
+                    </div>
+                    
+                    <!-- Benefits -->
+                    <div class="row text-center mt-4">
+                        <div class="col-4">
+                            <i class="fas fa-search fa-2x text-primary mb-2"></i>
+                            <small class="text-muted d-block">Smart Search</small>
+                        </div>
+                        <div class="col-4">
+                            <i class="fas fa-star fa-2x text-warning mb-2"></i>
+                            <small class="text-muted d-block">Save Favorites</small>
+                        </div>
+                        <div class="col-4">
+                            <i class="fas fa-chart-line fa-2x text-success mb-2"></i>
+                            <small class="text-muted d-block">Track Progress</small>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            
+            <!-- Login Link -->
+            <div class="card-footer bg-light text-center py-3">
+                <small class="text-muted">
+                    {{ static_text.get('have_account', 'Already have an account?') }}
+                    <a href="{{ url_for('login') }}" class="text-decoration-none fw-semibold">
+                        {{ static_text.get('login', 'Sign In') }}
+                    </a>
+                </small>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.input-group-text {
+    border-right: none;
+}
+
+.form-control:focus {
+    border-left: none;
+    box-shadow: none;
+}
+
+.card {
+    border-radius: 1rem;
+}
+
+.progress {
+    border-radius: 2px;
+}
+
+@media (max-width: 768px) {
+    .card-body {
+        padding: 2rem 1.5rem !important;
+    }
+    
+    .col-md-6 {
+        margin-bottom: 1rem;
+    }
+}
+
+@media (max-width: 576px) {
+    .card-body {
+        padding: 1.5rem 1rem !important;
+    }
+}
+</style>
+{% endblock content %}
